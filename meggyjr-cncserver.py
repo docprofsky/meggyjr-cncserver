@@ -35,11 +35,13 @@ posChanged = False
 botstatus = {"position": {"x": 0, "y": 0}, "height": "up", "color": ""}
 
 
-def setColor(color):
+def setColor(color, changeColor=True):
     colorName = "color{0}".format(color)    # Get color name for cncserver
     client.setPenHeight("up")   # Do not draw on the page while moving to color
 
-    for i in range(0, 3):   # Do brush wash
+    # Only go through all three waters if changing color
+    waterTimes = 3 if changeColor else 1
+    for i in range(0, waterTimes):   # Do brush wash
         client.setTool("water{0}".format(i))
     client.setTool(colorName)
 
@@ -55,8 +57,11 @@ while(True):
         elif command[2] == '1':
             client.setPenHeight("draw")
     elif command[0] == 'c':     # Set color
+        if command[2] == botstatus["color"]:
+            setColor(command[2], False)
+        else:
+            setColor(command[2], True)
         botstatus["color"] = command[2]
-        setColor(botstatus["color"])
     elif command[0] == 'u':
         posChanged = True
         botstatus["position"]["y"] = max(0, botstatus["position"]["y"] - args.move_dist)
