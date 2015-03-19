@@ -30,11 +30,13 @@ with cncserver.
     The '-d n' flag sets the move distance when a button is pressed to n.
 
 ## Resources
-[cncserver](https://github.com/techninja/cncserver/)
-[Python](https://www.python.org)
-[pySerial](http://pyserial.sourceforge.net/)
-[Python Requests](http://docs.python-requests.org/en/latest/)
+- Host software
+  - [cncserver](https://github.com/techninja/cncserver/)
+  - [Python](https://www.python.org)
+  - [pySerial](http://pyserial.sourceforge.net/)
+  - [Python Requests](http://docs.python-requests.org/en/latest/)
 
-[Arduino](http://arduino.cc/)
-[Meggy Jr RGB](http://wiki.evilmadscientist.com/Meggy_Jr_RGB)
-[Meggy Jr library](https://github.com/evil-mad/MeggyJrRGB/releases)
+- Meggy Jr software
+  - [Arduino](http://arduino.cc/)
+  - [Meggy Jr RGB](http://wiki.evilmadscientist.com/Meggy_Jr_RGB)
+  - [Meggy Jr library](https://github.com/evil-mad/MeggyJrRGB/releases)
