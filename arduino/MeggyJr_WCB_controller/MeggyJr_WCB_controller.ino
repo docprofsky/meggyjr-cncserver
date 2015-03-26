@@ -25,6 +25,11 @@ byte currentBrushPos = 0; // 1 is down, 0 is up
 
 unsigned long lastColorChange = 0;
 const int colorChangeDelay = 500;
+const int jogRepeatDelay = 500;
+const int jogRepeatInterval = 200;
+
+unsigned long lastButtonPress[6] = {0, 0, 0, 0, 0, 0};
+byte previousButtons = 0xff;
 
 void setup()                    // run once, when the sketch starts
 {
@@ -66,7 +71,7 @@ void drawBrushPos(byte brushPos) {
 
 void loop()                     // run over and over again
 {
-  CheckButtonsPress();   //Check to see which buttons are down that weren't before.
+  CheckButtonsDown();   //Check to see which buttons are down that weren't before.
 
   if(Button_A) {
     currentBrushPos = !currentBrushPos;
@@ -85,45 +90,69 @@ void loop()                     // run over and over again
     lastColorChange = millis();
   }
 
-  if(Button_Up) {
+
+  if(Button_Up && ~(previousButtons) & 4) {
+    lastButtonPress[2] = millis();
     DrawPx(1,4,Blue);
     Serial.println("u");
-  } 
-  else {
+  } else {
     DrawPx(1,4,Dark);
+    if(Button_Up && millis() - lastButtonPress[2] > jogRepeatDelay) {
+      DrawPx(1,4,Blue);
+      Serial.println("u");
+      lastButtonPress[2] = millis() + jogRepeatInterval - jogRepeatDelay;
+    }
   }
 
-  if(Button_Down) {
+  if(Button_Down && ~(previousButtons) & 8) {
+    lastButtonPress[3] = millis();
     DrawPx(1,2,Blue);
     Serial.println("d");
-  } 
-  else {
+  } else {
     DrawPx(1,2,Dark);
+    if(Button_Down && millis() - lastButtonPress[3] > jogRepeatDelay) {
+      DrawPx(1,2,Blue);
+      Serial.println("d");
+      lastButtonPress[3] = millis() + jogRepeatInterval - jogRepeatDelay;
+    }
   }
 
-  if(Button_Right) {
-    DrawPx(2,3,Blue);
-    Serial.println("r");
-  } 
-  else {
-    DrawPx(2,3,Dark);
-  }
-
-  if(Button_Left) {
+  if(Button_Left  && ~(previousButtons) & 16) {
+    lastButtonPress[4] = millis();
     DrawPx(0,3,Blue);
     Serial.println("l");
-  } 
-  else {
+  } else {
     DrawPx(0,3,Dark);
+    if(Button_Left && millis() - lastButtonPress[4] > jogRepeatDelay) {
+      DrawPx(0,3,Blue);
+      Serial.println("l");
+      lastButtonPress[4] = millis() + jogRepeatInterval - jogRepeatDelay;
+    }
   }
 
-  if(millis() > lastColorChange + colorChangeDelay && colorChanged) {
-    colorChanged = 0;;
+  if(Button_Right && ~(previousButtons) & 32) {
+    lastButtonPress[5] = millis();
+    DrawPx(2,3,Blue);
+    Serial.println("r");
+  } else {
+    DrawPx(2,3,Dark);
+    if(Button_Right && millis() - lastButtonPress[5] > jogRepeatDelay) {
+      DrawPx(2,3,Blue);
+      Serial.println("r");
+      lastButtonPress[5] = millis() + jogRepeatInterval - jogRepeatDelay;
+    }
+  }
+
+  if(millis() > lastColorChange + colorUpdateDelay && colorChanged) {
+    colorChanged = 0;
     Serial.print("c:");
     Serial.println(currentColor);
   }
 
   DisplaySlate();      // Write the updated game buffer to the screen.
+
+  previousButtons = Meg.GetButtons();
+
   delay(30);          // Wait 30 ms
 }    
 
