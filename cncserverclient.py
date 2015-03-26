@@ -9,7 +9,7 @@ class CNCServerClient:
     """
     hasConnection = False
 
-    def __init__(self, cncserver_address, cncserver_args=""):
+    def __init__(self, cncserver_address="http://localhost:4242", cncserver_args=""):
         # Create Logging instance
         self.logger = logging.getLogger('CNCClient')
         self.logger.debug('Client instance created!')
