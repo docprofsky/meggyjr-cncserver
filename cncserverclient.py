@@ -65,6 +65,25 @@ class CNCServerClient:
             # Ignore timeouts on the returned status
             pass
 
+    def setPenSpeed(self, speed_drawing, speed_moving):
+        """
+        Set the speed of the robot
+        """
+        if not self.hasConnection: return
+
+        # Assemble packet and compress it into a JSON formatted string
+        data = {"speed:drawing": speed_drawing, "speed:moving": speed_moving}
+        data_json = json.dumps(data)
+
+        try:
+            # Send the pen data to the server
+            r = requests.put(self.cncserver_address+'/v1/settings/bot', data=data, timeout = 0.01)
+        except requests.exceptions.ReadTimeout: pass
+        except requests.exceptions.ConnectTimeout:
+            # Ignore timeouts on the returned status
+            pass
+
+
     def getPenStatus(self):
         try:
             # Send the pen data to the server
