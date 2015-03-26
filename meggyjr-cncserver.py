@@ -74,6 +74,11 @@ while(True):
     elif command[0] == 'r':
         posChanged = True
         botstatus["position"]["x"] = min(100, botstatus["position"]["x"] + args.move_dist)
+    elif command[0] == 'p':
+        botstatus["position"] = {"x": -1, "y": -1}  # Next time move is sent the pen will move to (0, 0)
+        client.parkPen()
+        client.unlockMotors()
+        client.zeroPenPos()
 
     if posChanged:
         client.setPenPos(botstatus["position"]["x"], botstatus["position"]["y"])

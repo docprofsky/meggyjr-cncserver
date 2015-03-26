@@ -21,10 +21,20 @@ const byte colorPalette[8] = {
 
 byte currentColor = 0;
 byte colorChanged = 0;
-byte currentBrushPos = 0; // 1 is down, 0 is up
+byte colorReinked = 0;
+
+struct brush{
+  byte brushPos : 1;  // 1 is down, 0 is up
+  byte posChanged : 1;
+  byte brushParked : 1;
+};
+
+struct brush brushStatus = {0, 0, 0};
 
 unsigned long lastColorChange = 0;
-const int colorChangeDelay = 500;
+const int colorUpdateDelay = 500;
+const int colorInkDelay = 200;
+const int brushParkDelay = 500;
 const int jogRepeatDelay = 500;
 const int jogRepeatInterval = 200;
 
@@ -84,21 +94,67 @@ void loop()                     // run over and over again
 {
   CheckButtonsDown();   //Check to see which buttons are down that weren't before.
 
-  if(Button_A) {
-    currentBrushPos = !currentBrushPos;
-    Serial.print("b:");
-    Serial.println(currentBrushPos);
-    drawBrushPos(currentBrushPos);
-  }
-  if(Button_B) {
+  if(Button_B && ~(previousButtons) & 1) {
+    lastButtonPress[0] = millis();
     currentColor++;
     if(currentColor > 7) {
       currentColor = 0;
     }
     colorChanged = 1;
     drawColor(currentColor);
-    drawBrushPos(currentBrushPos);
+    drawBrushPos(brushStatus.brushPos);
     lastColorChange = millis();
+  } else if(Button_B) {
+      if(millis() - lastButtonPress[0] > colorInkDelay && colorReinked == 0) {
+        currentColor--;
+        if(currentColor > 7) {
+          currentColor = 0;
+        }
+        drawColor(currentColor);
+        drawBrushPos(brushStatus.brushPos);
+        colorChanged = 1;
+        colorReinked = 1;
+        lastColorChange = millis() - colorUpdateDelay;
+      }
+    }
+
+  if(!Button_B && (previousButtons) & 1) {
+   colorReinked = 0;
+  }
+
+
+  if(Button_A && ~(previousButtons) & 2 && brushStatus.brushParked == 0) {
+    lastButtonPress[1] = millis();
+    brushStatus.brushPos = !brushStatus.brushPos;
+    drawBrushPos(brushStatus.brushPos);
+    brushStatus.posChanged = 1;
+  } else if(Button_A) {
+      if(millis() - lastButtonPress[1] > brushParkDelay && brushStatus.brushParked == 0) {
+        brushStatus.brushPos = 0;
+        drawBrushPos(brushStatus.brushPos);
+        brushStatus.brushParked = 1;
+        brushStatus.posChanged = 1;
+        for(byte auxLedVal = 128; auxLedVal != 0; auxLedVal = auxLedVal >> 1) {
+          SetAuxLEDs(auxLedVal);
+          delay(20);
+        }
+        SetAuxLEDs(0);
+      }
+    }
+
+  //  The button goes up                     or the state has changed   and we need to park the brush
+  if((!Button_A && (previousButtons) & 2) || (brushStatus.posChanged && brushStatus.brushParked)) {
+    if(brushStatus.posChanged) {
+      Serial.print("b:");
+      Serial.println(brushStatus.brushPos);
+      if(brushStatus.brushParked) {
+        Serial.println("p");
+      }
+      brushStatus.posChanged = 0;
+    }
+  }
+  if(!Button_A && (previousButtons) & 2) {
+     brushStatus.brushParked = 0;
   }
 
 
