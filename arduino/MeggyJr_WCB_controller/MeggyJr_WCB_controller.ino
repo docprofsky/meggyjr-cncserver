@@ -221,8 +221,5 @@ void loop()                     // run over and over again
   previousButtons = Meg.GetButtons();
 
   delay(30);          // Wait 30 ms
-}    
-
-
-
+}
 
