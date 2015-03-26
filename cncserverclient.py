@@ -131,6 +131,17 @@ class CNCServerClient:
             # Ignore timeouts on the returned status
             pass
 
+    def zeroPenPos(self):
+        command = {"reset": 1}
+        try:
+            # Send the request to the server
+            r = requests.put(self.cncserver_address + '/v1/motors/', data=command, timeout = 0.01)
+        except requests.exceptions.ReadTimeout: pass
+        except requests.exceptions.ConnectTimeout:
+            # Ignore timeouts on the returned status
+            pass
+
+
     def launchCncServer(self):
         """
         Looks for a built-in CNCServer instance at ../cncserver/ and launches it.
