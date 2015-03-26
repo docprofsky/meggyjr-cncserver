@@ -45,6 +45,17 @@ void setup()                    // run once, when the sketch starts
   }
   drawColor(currentColor);  
   DisplaySlate();
+
+  byte auxLedVal = 1;
+  for(; auxLedVal < 127; auxLedVal = auxLedVal << 1) {
+    SetAuxLEDs(auxLedVal);
+    delay(20);
+  }
+  for(; auxLedVal != 0; auxLedVal = auxLedVal >> 1) {
+    SetAuxLEDs(auxLedVal);
+    delay(20);
+  }
+  SetAuxLEDs(0);
 }  // End setup()
 
 void drawColor(byte color) {
